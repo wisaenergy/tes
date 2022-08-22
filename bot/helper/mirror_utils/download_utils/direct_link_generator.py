@@ -8,6 +8,10 @@ from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no c
 than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
 for original authorship. """
 
+import requests
+import math
+import re
+
 from base64 import b64decode
 from requests import get as rget, head as rhead, post as rpost, Session as rsession
 from re import findall as re_findall, sub as re_sub, match as re_match, search as re_search
@@ -129,8 +133,8 @@ def uptobox(url: str) -> str:
     return dl_url
 
 def zippy_share(url: str) -> str:
-    base_url = re_search('http.+.zippyshare.com', url).group()
-    response = rget(url)
+    base_url = re.search('http.+.zippyshare.com', url).group()
+    response = requests.get(url)
     pages = BeautifulSoup(response.text, "html.parser")
     js_script = pages.find("div", style="margin-left: 24px; margin-top: 20px; text-align: center; width: 303px; height: 105px;")
     if js_script is None:
@@ -138,29 +142,29 @@ def zippy_share(url: str) -> str:
     js_script = str(js_script)
 
     try:
-        var_a = re_findall(r"var.a.=.(\d+)", js_script)[0]
+        var_a = re.findall(r"var.a.=.(\d+)", js_script)[0]
         mtk = int(math.pow(int(var_a),3) + 3)
-        uri1 = re_findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
-        uri2 = re_findall(r"\+\"/(.*?)\"", js_script)[0]
+        uri1 = re.findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
+        uri2 = re.findall(r"\+\"/(.*?)\"", js_script)[0]
     except:
         try:
-            a, b = re_findall(r"var.[ab].=.(\d+)", js_script)
+            a, b = re.findall(r"var.[ab].=.(\d+)", js_script)
             mtk = eval(f"{math.floor(int(a)/3) + int(a) % int(b)}")
-            uri1 = re_findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
-            uri2 = re_findall(r"\)\+\"/(.*?)\"", js_script)[0]
+            uri1 = re.findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
+            uri2 = re.findall(r"\)\+\"/(.*?)\"", js_script)[0]
         except:
             try:
-                mtk = eval(re_findall(r"\+\((.*?).\+", js_script)[0] + "+ 11")
-                uri1 = re_findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
-                uri2 = re_findall(r"\)\+\"/(.*?)\"", js_script)[0]
+                mtk = eval(re.findall(r"\+\((.*?).\+", js_script)[0] + "+ 11")
+                uri1 = re.findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
+                uri2 = re.findall(r"\)\+\"/(.*?)\"", js_script)[0]
             except:
                 try:
-                    mtk = eval(re_findall(r"\+.\((.*?)\).\+", js_script)[0])
-                    uri1 = re_findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
-                    uri2 = re_findall(r"\+.\"/(.*?)\"", js_script)[0]
+                    mtk = eval(re.findall(r"\+.\((.*?)\).\+", js_script)[0])
+                    uri1 = re.findall(r"\.href.=.\"/(.*?)/\"", js_script)[0]
+                    uri2 = re.findall(r"\+.\"/(.*?)\"", js_script)[0]
                 except Exception as err:
                     LOGGER.error(err)
-                    raise DirectDownloadLinkException("ERROR: Failed to Get Direct Link")
+                    raise DirectDownloadLinkException("ERROR: Tidak dapat mengambil direct link")
     dl_url = f"{base_url}/{uri1}/{int(mtk)}/{uri2}"
     return dl_url
 
